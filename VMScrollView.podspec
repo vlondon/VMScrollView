@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/vlondon/VMScrollView.git", :tag => "1.0.0" }
 
   s.source_files  = ["VMScrollView/*"]
+  s.exclude_files = ["VMScrollViewDemo/*"]
 
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
 
