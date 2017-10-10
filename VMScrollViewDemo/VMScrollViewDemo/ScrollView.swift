@@ -11,7 +11,7 @@ import UIKit
 
 class ScrollView: VMScrollView {
     
-    override var cellClass: UICollectionViewCell.Type {
+    override func cellClass() -> UICollectionViewCell.Type {
         return ScrollViewCell.self
     }
     

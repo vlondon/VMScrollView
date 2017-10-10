@@ -9,7 +9,7 @@
 import UIKit
 
 public protocol VMScrollViewProtocol {
-    func cellClass() -> UICollectionViewCell.Type
+    var cellClass: UICollectionViewCell.Type { get }
     
     func configureCollectionCell(_ cell: UICollectionViewCell, data: Any) -> UICollectionViewCell
     func scrollToPage(_ page: Int)
@@ -24,9 +24,9 @@ public protocol VMScrollViewCell {
 
 open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
     
-    static let kVMScrollCellId = "kVMScrollCellId"
+    static let kCYScrollCellId = "kVMScrollCellId"
     
-    open func cellClass() -> UICollectionViewCell.Type {
+    open var cellClass: UICollectionViewCell.Type {
         return UICollectionViewCell.self
     }
     
@@ -70,7 +70,7 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.bounces = false
         
-        collectionView.register(self.cellClass(), forCellWithReuseIdentifier: VMScrollView.kVMScrollCellId)
+        collectionView.register(cellClass, forCellWithReuseIdentifier: VMScrollView.kCYScrollCellId)
         return collectionView
     }()
     
@@ -281,7 +281,7 @@ extension VMScrollView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     }
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: VMScrollView.kVMScrollCellId, for: indexPath)
+        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: VMScrollView.kCYScrollCellId, for: indexPath)
         
         let index = self.transferIndex(indexPath.row)
         

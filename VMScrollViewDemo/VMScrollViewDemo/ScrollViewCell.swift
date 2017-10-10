@@ -38,7 +38,7 @@ class ScrollViewCell: UICollectionViewCell {
     
     fileprivate lazy var titleCenterConst: ParallaxConstraint = {
         return (NSLayoutConstraint(
-            item: titleLabel,
+            item: self.titleLabel,
             attribute: .centerX,
             relatedBy: .equal,
             toItem: self.contentView,
@@ -50,7 +50,7 @@ class ScrollViewCell: UICollectionViewCell {
     
     fileprivate lazy var bodyCenterConst: ParallaxConstraint = {
         return (NSLayoutConstraint(
-            item: bodyLabel,
+            item: self.bodyLabel,
             attribute: .centerX,
             relatedBy: .equal,
             toItem: self.contentView,
@@ -62,10 +62,10 @@ class ScrollViewCell: UICollectionViewCell {
     
     fileprivate lazy var bodyTopConst: ParallaxConstraint = {
         return (NSLayoutConstraint(
-            item: bodyLabel,
+            item: self.bodyLabel,
             attribute: .top,
             relatedBy: .equal,
-            toItem: titleLabel,
+            toItem: self.titleLabel,
             attribute: .bottom,
             multiplier: 1,
             constant: 0

@@ -9,7 +9,7 @@
 import UIKit
 
 public protocol VMScrollViewProtocol {
-    var cellClass: UICollectionViewCell.Type { get }
+    func cellClass() -> UICollectionViewCell.Type
     
     func configureCollectionCell(_ cell: UICollectionViewCell, data: Any) -> UICollectionViewCell
     func scrollToPage(_ page: Int)
@@ -24,9 +24,9 @@ public protocol VMScrollViewCell {
 
 open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
     
-    static let kCYScrollCellId = "kVMScrollCellId"
+    static let kVMScrollCellId = "kVMScrollCellId"
     
-    open var cellClass: UICollectionViewCell.Type {
+    open func cellClass() -> UICollectionViewCell.Type {
         return UICollectionViewCell.self
     }
     
@@ -47,18 +47,22 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
     
     public var data: [Any] {
         didSet {
-            refresh()
+            if data.count != oldValue.count {
+                refresh()
+            } else {
+                refreshWithNoDataChange()
+            }
         }
     }
     
-    private lazy var collectionView: UICollectionView = {
+    public lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 0
         layout.minimumLineSpacing = 0
         layout.scrollDirection = .horizontal
         
         let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = UIColor.white
+        collectionView.backgroundColor = .clear
         collectionView.isPagingEnabled = true
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -66,7 +70,7 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.bounces = false
         
-        collectionView.register(cellClass, forCellWithReuseIdentifier: VMScrollView.kCYScrollCellId)
+        collectionView.register(self.cellClass(), forCellWithReuseIdentifier: VMScrollView.kVMScrollCellId)
         return collectionView
     }()
     
@@ -75,7 +79,7 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
     public override init(frame: CGRect) {
         self.data = []
         super.init(frame: frame)
-        self.confiugureConstraints()
+        self.configureConstraints()
     }
     
     public convenience init(with data: [Any] = []) {
@@ -88,7 +92,7 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func confiugureConstraints() {
+    private func configureConstraints() {
         self.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         let leftConst = NSLayoutConstraint(
@@ -217,7 +221,7 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
     
     //MARK:- VMScrollViewProtocol
     
-    public func refresh() {
+    open func refresh() {
         self.collectionView.reloadData()
         
         if self.data.count > 1 {
@@ -230,11 +234,11 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
         self.updatePageControl()
     }
     
-    public func refreshWithNoDataChange() {
+    open func refreshWithNoDataChange() {
         self.collectionView.reloadData()
     }
     
-    private func transferIndex(_ index: Int) -> Int {
+    fileprivate func transferIndex(_ index: Int) -> Int {
         if self.data.count <= 1 {
             return 0
         }
@@ -252,7 +256,7 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
         return cell
     }
     
-    open func scrollToPage(_ page:Int){
+    open func scrollToPage(_ page: Int) {
         self.updatePageControl(page: page)
     }
     
@@ -265,18 +269,19 @@ open class VMScrollView: UICollectionReusableView, VMScrollViewProtocol {
 
 extension VMScrollView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     //MARK:- delegate method
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.data.count > 1 ? self.data.count + 2 : self.data.count
     }
     
-    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if let cell = cell as? VMScrollViewCell {
             cell.refresh()
         }
     }
     
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: VMScrollView.kCYScrollCellId, for: indexPath)
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: VMScrollView.kVMScrollCellId, for: indexPath)
         
         let index = self.transferIndex(indexPath.row)
         
@@ -288,7 +293,7 @@ extension VMScrollView: UICollectionViewDataSource, UICollectionViewDelegateFlow
         
     }
     
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.size.width, height: collectionView.frame.size.height)
     }
     
